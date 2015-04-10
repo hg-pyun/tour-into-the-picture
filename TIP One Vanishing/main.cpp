@@ -3,7 +3,7 @@
 using namespace std;
 
 GLuint texture;
-
+GLdouble wX, wY, wZ;
 GLuint LoadTexture( const char * filename )
 {
 	GLuint texture;
@@ -57,6 +57,7 @@ void init(){
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	texture = LoadTexture( "background.bmp" );
 	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_DEPTH_TEST);
 }
 
 void draw(){
@@ -70,15 +71,61 @@ void draw(){
 	glEnd();
 	glFlush();
 }
+/* Vanish Point 검출을 위한 마우스 이벤트
+ *
+ */
+void vanishingPointClick(GLint Button, GLint State, GLint X, GLint Y){
+	if(Button == GLUT_LEFT && State == GLUT_DOWN){ // Mouse Down Event
+		cout << "left button click " << endl;
+	}
+
+}
+
+void unProject(int xCursor, int yCursor)
+{
+	GLdouble projection[16];
+	GLdouble modelView[16];
+	GLint viewPort[4]; // 원점의 x, y, 스크린 width, height
+	glGetDoublev(GL_PROJECTION_MATRIX,projection);
+	glGetDoublev(GL_MODELVIEW_MATRIX,modelView);
+	glGetIntegerv(GL_VIEWPORT,viewPort);
+
+	GLfloat zCursor,winX,winY;
+	winX = (float)xCursor;
+	winY = (float)viewPort[3]-(float)yCursor;
+	glReadPixels((int)winX, (int)winY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &zCursor); 
+
+	if(gluUnProject(winX,winY,zCursor,modelView,projection,viewPort,&wX,&wY,&wZ)==GLU_FALSE){
+		cout << "false" << endl;
+}
+
+void cameraMoveEvent(unsigned char KeyPressed, int X, int Y){
+	switch (KeyPressed)
+	{
+	case 'W' : // Up
+		break;
+	case 'S' : // Down
+		break;
+	case 'A' : // Left
+		break;
+	case 'D' : // Right
+	default:
+		break;
+	}
+
+}
 
 int main(int argc, char **argv){
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA );
 	glutInitWindowSize(500,500);
+	glutInitWindowPosition(500,500);
 	glutCreateWindow("Tour Into The Picture");
 	init();					// init 
 	glutDisplayFunc(draw);	// draw
-	// 키보드 이벤트
+	// 이벤트
+	glutKeyboardFunc(cameraMoveEvent);
+	glutMouseFunc(vanishingPointClick);
 	glutMainLoop();
 
 
