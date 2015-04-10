@@ -3,7 +3,7 @@
 using namespace std;
 
 GLuint texture;
-GLdouble wX, wY, wZ;
+GLdouble wX, wY, wZ;		// World Coordination
 GLuint LoadTexture( const char * filename )
 {
 	GLuint texture;
@@ -74,15 +74,8 @@ void draw(){
 /* Vanish Point 검출을 위한 마우스 이벤트
  *
  */
-void vanishingPointClick(GLint Button, GLint State, GLint X, GLint Y){
-	if(Button == GLUT_LEFT && State == GLUT_DOWN){ // Mouse Down Event
-		cout << "left button click " << endl;
-	}
 
-}
-
-void unProject(int xCursor, int yCursor)
-{
+void unProject(int xCursor, int yCursor){
 	GLdouble projection[16];
 	GLdouble modelView[16];
 	GLint viewPort[4]; // 원점의 x, y, 스크린 width, height
@@ -97,7 +90,18 @@ void unProject(int xCursor, int yCursor)
 
 	if(gluUnProject(winX,winY,zCursor,modelView,projection,viewPort,&wX,&wY,&wZ)==GLU_FALSE){
 		cout << "false" << endl;
+	}
 }
+
+void vanishingPointClick(GLint Button, GLint State, GLint X, GLint Y){
+	if(Button == GLUT_LEFT && State == GLUT_DOWN){ // Mouse Down Event
+		cout << "left button click " << endl;
+		unProject(X,Y);
+		cout << "Widnow Coordination - X : " << X << " Y : " << Y << endl;
+		cout << "World Coordination - X : " << wX << " Y : " << wY << " Z : "<< wZ <<endl;
+	}
+}
+
 
 void cameraMoveEvent(unsigned char KeyPressed, int X, int Y){
 	switch (KeyPressed)
